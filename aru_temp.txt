@@ -1,0 +1,116 @@
+#define Player_A 1
+#define Player_B 2
+
+struct move{
+int pile_index;
+int coins_removed;
+};
+
+void showPiles (int piles[] , int n){
+   int i;
+   cout<<"Current Game Status ->";
+   for( i=0; i<n; i++){
+       cout<<piles[i] << " ";       
+   }
+   cout << endl;
+}
+
+bool gameOver(int piles[], int n){
+   int i;
+   for(i=0; i<n; i++)
+      if(piles[i]!=0)
+         return false;
+
+   return true;
+}
+
+void declareWinner(int whoseTurn){
+if(whoseTurn == Player_A)
+cout<<"\nPlayer2 won";
+else
+cout<<"\nPlayer1 won";
+}
+
+int calculateNimSum( int piles[], int n )
+{
+int i,nimsum = piles[0];
+for(i=1; i<n; i++)
+
+nimsum = nimsum ^ piles[i];
+return(nimsum);
+}
+void makeMove ( int piles[], int n, struct move * moves )
+{
+int i, nim_sum = calculateNimSum(piles, n);
+if(nim_sum !=0)
+{
+for(i=0; i<n; i++)
+{
+if((piles[i] ^ nim_sum) < piles[i])
+{
+(*moves).pile_index = i;
+(*moves).coins_removed =piles[i]-(piles[i]^nim_sum);
+piles[i]=(piles[i] ^ nim_sum);
+break;
+}
+}
+}
+else
+{
+int non_zero_indices[n], count=0;
+for(i=0; i<n; i++)
+if(piles[i] > 0)
+non_zero_indices [count++] =i;
+(*moves).pile_index=(rand()%(count));
+(*moves).coins_removed=1+(rand()%(piles[(*moves).pile_index]));
+piles[(*moves).pile_index]=piles[(*moves).pile_index]-(*moves).coins_removed;
+if(piles[(*moves).pile_index] <0)
+piles[(*moves).pile_index]=0;
+}
+return;
+}
+
+void playGame( int piles[], int n, int whoseTurn )
+{
+cout<<endl<<"GAME STARTS"<<endl<<endl;
+struct move moves;
+while( gameOver(piles, n) == false )
+{
+showPiles(piles, n);
+makeMove(piles, n, &moves);
+if(whoseTurn == Player_A)
+{
+cout<<"PLAYER_A removes coins from pile"<<moves.coins_removed<<"at index"<<moves.pile_index;
+cout<<endl; 
+whoseTurn = Player_B;
+}
+else
+{
+cout<<"PLAYER2 removes coins from pile"<<moves.coins_removed<<"at index"<<moves.pile_index;
+cout<<endl;
+whoseTurn=Player_A;
+}
+}
+showPiles(piles, n);
+declareWinner( whoseTurn );
+
+}
+void knowWinnerBeforePlaying( int piles[], int n, int whoseTurn )
+{
+cout<<"Prediction before playing the game->";
+if( calculateNimSum(piles, n) !=0 )
+{
+if(whoseTurn == Player_A)
+cout<<"PLAYER_A will win\n";
+else
+cout<<"PLAYER_B will win\n";
+}
+else
+{
+if(whoseTurn == Player_A)
+cout<<"PLAYER_B will win"<<endl;
+else
+cout<<"PLAYER_A will win"<<endl;
+}
+
+}
